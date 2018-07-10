@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
+
+    <color name="color_gray_light">#F5F5F5</color>
+    <color name="white">#ffffff</color>
+    <color name="gray">#95d4d3d3</color>
+    <color name="text_gray">#999999</color>
+    <color name="text_blue">#149cfd</color>
+    <color name="text_green">#34f2ff</color>
+    <color name="my_gray">#a49f9f9f</color>
+    <!-- Background color for light LeBubbleView. -->
+    <color name="bubbleView_light_background">#CCFFFFFF</color>
+    <!-- Background color for dark LeBubbleView. -->
+    <color name="bubbleView_dark_background">#CC000000</color>
+    <!-- text color for light LeBubbleTextView. -->
+    <color name="bubbleView_light_text_color">#CC323C49</color>
+    <!-- text color for dark LeBubbleTextView. -->
+    <color name="bubbleView_dark_text_color">#CCFFFFFF</color>
+    <!-- press Background color for light LeBubbleView. -->
+    <color name="bubbleView_light_press_background">#E6FFFFFF</color>
+    <!-- press Background color for dark LeBubbleView. -->
+    <color name="bubbleView_dark_press_background">#E6000000</color>
+    <color name="orange_ligth">#ffd39b</color>  <color name="primary">#EF5350</color>
+    <color name="overlay_light">#F8F8F8</color>
+</resources>

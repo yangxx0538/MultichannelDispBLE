@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/loading_dialog_bg"
+    android:orientation="vertical"
+    android:padding="10.0dip">
+
+    <TextView
+        android:id="@+id/dialog_msg"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_toRightOf="@+id/rotateLoading"
+        android:padding="10.0dip"
+        android:text="请握拳，伸直后点击按钮开始录制,并等待十秒"
+        android:textColor="#ffffff"
+        android:textSize="16sp" />
+
+    <ImageView
+        android:id="@+id/img_hand"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_below="@id/dialog_msg"
+        android:layout_centerHorizontal="true"
+        android:src="@mipmap/hand_w" />
+
+    <Button
+        android:id="@+id/dialog_next"
+        android:layout_width="120dp"
+        android:layout_height="40dp"
+        android:layout_below="@id/img_hand"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/selector_btn_click_con"
+        android:gravity="center"
+        android:text="开始"
+        android:textColor="@color/text_blue"
+        android:textSize="18sp" />
+
+</RelativeLayout>

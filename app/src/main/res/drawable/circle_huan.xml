@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="ring"
+    android:thickness="15dp"
+    android:useLevel="false">
+
+    <!-- 设置渐变填充色 -->
+    <gradient
+        android:angle="135"
+        android:startColor="#045c91"
+        android:centerColor="#279dc7"
+        android:endColor="#76fff6"  />
+</shape>

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/loading_dialog_bg"
+    android:orientation="vertical"
+    android:padding="10.0dip">
+
+    <TextView
+        android:textSize="19sp"
+        android:textColor="@color/white"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="30dp"
+        android:text="选择频率" />
+
+    <com.rotex.loopview.LoopView
+        android:id="@+id/loopView"
+        android:layout_width="match_parent"
+        android:layout_height="180dp"
+        android:layout_marginTop="30dp"
+        app:awv_textsize="20"
+        app:awv_centerTextColor="@color/white"
+        app:awv_outerTextColor="@color/gray"
+
+        app:awv_dividerTextColor="@color/text_green"
+        />
+
+    <LinearLayout
+        android:layout_marginTop="20dp"
+        android:gravity="center"
+        android:layout_below="@id/loopView"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:orientation="horizontal">
+
+        <Button
+            android:gravity="center"
+            android:id="@+id/cancle"
+            android:textColor="@color/text_blue"
+            android:textSize="18sp"
+            android:text="取消"
+            android:background="@drawable/selector_btn_click_con"
+            android:layout_width="100dp"
+            android:layout_height="match_parent" />
+
+        <Button
+            android:gravity="center"
+            android:id="@+id/ok"
+            android:textColor="@color/text_blue"
+            android:textSize="18sp"
+            android:text="确定"
+            android:background="@drawable/selector_btn_click_con"
+            android:layout_marginLeft="30dp"
+            android:layout_width="100dp"
+            android:layout_height="match_parent" />
+    </LinearLayout>
+
+</RelativeLayout>

@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.zhy.android.percent.support.PercentLinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/main_rotex_background"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:layout_alignParentTop="true">
+
+        <RelativeLayout
+            android:id="@+id/re_title"
+            android:layout_width="match_parent"
+            android:layout_height="35dp">
+
+            <ImageView
+                android:id="@+id/title_setting"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="10dp"
+                android:scaleType="centerCrop"
+                android:src="@mipmap/settings_setting_128px" />
+            <!--<ImageView-->
+            <!--android:id="@+id/title_back"-->
+            <!--android:layout_width="20dp"-->
+            <!--android:layout_height="20dp"-->
+            <!--android:layout_alignParentRight="true"-->
+            <!--android:layout_alignParentBottom="true"-->
+            <!--android:layout_marginRight="10dp"-->
+            <!--android:src="@mipmap/battery0" />-->
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="35dp"
+                android:layout_centerInParent="true"
+                android:gravity="center"
+                android:text="Breath"
+                android:textColor="@color/white"
+                android:textSize="19sp" />
+
+
+        </RelativeLayout>
+    </RelativeLayout>
+
+    <com.rotex.rotexemg.views.ShowWaveView
+        android:id="@+id/rotex_main_wave"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_centerInParent="true"
+        android:layout_gravity="center"
+        android:layout_margin="5dp"
+        app:BackLineColor="#ffffff"
+        app:PointerLineColor="#d20266d9"
+        app:TitleColor="#880272a3"
+        app:TitleSize="15sp"
+        app:layout_heightPercent="40%h" />
+
+    <LinearLayout
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_heightPercent="10%h"
+        >
+        <TextView
+            android:textSize="20sp"
+            android:layout_marginLeft="10dp"
+            android:gravity="center"
+            android:text="@string/breath_rate"
+            android:textColor="@color/white"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent" />
+
+        <TextView
+            android:textSize="20sp"
+            android:gravity="center"
+            android:textColor="@color/white"
+            android:layout_marginLeft="30dp"
+            android:id="@+id/breath_rate"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent" />
+
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <Button
+            android:id="@+id/emg_start_wave"
+            android:layout_width="200dp"
+            android:layout_height="50dp"
+            android:background="@drawable/selector_btn_study"
+            android:gravity="center"
+            android:text="@string/show_wave"
+            android:textSize="20sp" />
+
+        <Button
+            android:id="@+id/emg_reset"
+            android:layout_width="200dp"
+            android:layout_height="50dp"
+            android:layout_marginTop="40dp"
+            android:background="@drawable/selector_btn_study"
+            android:gravity="center"
+            android:text="@string/rest_wave"
+            android:textSize="20sp"/>
+
+
+        <Button
+            android:visibility="gone"
+            android:id="@+id/emg_open_untiy"
+            android:layout_width="200dp"
+            android:layout_height="50dp"
+            android:layout_marginTop="40dp"
+            android:background="@drawable/selector_btn_study"
+            android:gravity="center"
+            android:text="@string/open_unity"
+            android:textSize="20sp"/>
+    </LinearLayout>
+
+</com.zhy.android.percent.support.PercentLinearLayout>
