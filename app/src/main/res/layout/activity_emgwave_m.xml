@@ -160,6 +160,7 @@
         android:gravity="center"
         android:orientation="horizontal">
 
+
         <Button
             android:id="@+id/emg_start_wave"
             android:layout_width="100dp"
@@ -190,6 +191,15 @@
             android:text="@string/open_unity"
             android:textSize="15sp" />
 
+        <Button
+            android:id="@+id/mag_calibration"
+            android:layout_width="100dp"
+            android:layout_height="30dp"
+            android:layout_marginLeft="20dp"
+            android:background="@drawable/selector_btn_study"
+            android:gravity="center"
+            android:text="@string/mag_calibration"
+            android:textSize="15sp" />
     </LinearLayout>
 
 </com.zhy.android.percent.support.PercentLinearLayout>

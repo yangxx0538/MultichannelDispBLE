@@ -30,6 +30,7 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.orhanobut.dialogplus.DialogPlus;
 import com.orhanobut.dialogplus.GridHolder;
@@ -74,7 +75,9 @@ public class EmgWaveMActivity extends BaseActivity {
     ShowWaveView showWaveView5;
     Button mBtStartWave;
     Button mBtReSet;
+
     boolean isStart = true;
+
     ImageView mBtsetting;
     BleService mBleService;
     TcpServer server;
@@ -88,10 +91,25 @@ public class EmgWaveMActivity extends BaseActivity {
     int[] initEndData = new int[5];
     boolean isRecordData = false;
 
+    //added by yxx
+    Button mMagCalibraton;
+    boolean isCalibrating = false;
+    int magBufferSize = 800;
+    short [] mag_x_buffer = new short[magBufferSize];
+    short[] mag_y_buffer = new short[magBufferSize];
+    short[] mag_z_buffer = new short[magBufferSize];
+    short mag_x_offset,mag_y_offset,mag_z_offset;
+    short mag_x_max,mag_x_min,mag_y_max, mag_y_min,mag_z_max,mag_z_min;
+    int buffer_count;
+    float mag_z_ratio = 1,mag_y_ratio = 1;
+    int x_range,y_range,z_range;
+    short mag_x,mag_y,mag_z;
+    short mag_x_final,mag_y_final;
 
     Button open_demo;
     final int SEND_WAVE_DATA = 0x001;
-
+    final int CALIBRATION_SUCCESS = 0x002;
+    final int CALIBRATION_FAILED = 0x003;
 
     @SuppressLint("HandlerLeak")
     Handler handler = new Handler() {
@@ -116,17 +134,17 @@ public class EmgWaveMActivity extends BaseActivity {
 
                     showWaveView5.setLinePoint((float) data[4]);
                     if (initFlag == 0 && isRecordData == true) {
-                        initStartData[0] = (int) (data[0] *     1.2);
-                        initStartData[1] = (int) (data[1] *     1.2);
-                        initStartData[2] = (int) (data[2] *     1.2);
-                        initStartData[3] = (int) (data[3] *     1.2);
-                        initStartData[4] = (int) (data[4] *     1.2);
+                        initStartData[0] = 1024;
+                        initStartData[1] = 1024;
+                        initStartData[2] = 1024;
+                        initStartData[3] = 1024;
+                        initStartData[4] = 1024;
                     } else if (initFlag == 1 && isRecordData == true) {
-                        initEndData[0] = (int) (data[0]);
-                        initEndData[1] = (int) (data[1]);
-                        initEndData[2] = (int) (data[2]);
-                        initEndData[3] = (int) (data[3]);
-                        initEndData[4] = (int) (data[4]);
+                        initEndData[0] = 0;
+                        initEndData[1] = 0;
+                        initEndData[2] = 0;
+                        initEndData[3] = 0;
+                        initEndData[4] = 0;
                     }
 
 
@@ -146,6 +164,16 @@ public class EmgWaveMActivity extends BaseActivity {
 
                             getString(R.string.ble_disconnected), TastyToast.LENGTH_LONG, TastyToast.ERROR);
                     break;
+
+                case CALIBRATION_SUCCESS:
+
+                    TastyToast.makeText(EmgWaveMActivity.this, "Calibration Success! !!", TastyToast.LENGTH_LONG, TastyToast.SUCCESS);
+
+                    break;
+                case CALIBRATION_FAILED:
+                    TastyToast.makeText(EmgWaveMActivity.this, "Calibration Failed XXX", TastyToast.LENGTH_LONG, TastyToast.ERROR);
+                    break;
+
             }
         }
     };
@@ -207,14 +235,14 @@ public class EmgWaveMActivity extends BaseActivity {
         tv_roll = (TextView) findViewById(R.id.text_r);
         tv_yaw = (TextView) findViewById(R.id.text_y);
 
-
+        mMagCalibraton = (Button) findViewById(R.id.mag_calibration);
         mBtsetting = (ImageView) findViewById(R.id.title_setting);
         mBtReSet = (Button) findViewById(R.id.emg_reset);
         mBleService = BleService.getInstance();
         mImgBt = (ImageView) findViewById(R.id.title_back);
         open_demo = (Button) findViewById(R.id.emg_open_untiy);
         mBtStartWave = (Button) findViewById(R.id.emg_start_wave);
-        setListener(mBtStartWave, mBtReSet, mBtsetting, open_demo);
+        setListener(mBtStartWave, mBtReSet, mBtsetting, open_demo,mMagCalibraton);
         setBleServiceListener();
 
 
@@ -332,6 +360,15 @@ public class EmgWaveMActivity extends BaseActivity {
 
             case R.id.emg_open_untiy:
                 doStartApplicationWithPackageName("com.rotex.handsDemo");
+                break;
+
+            case R.id.mag_calibration:
+
+                TastyToast.makeText(EmgWaveMActivity.this, "Start Calibrating, Please shake your hands.....", TastyToast.LENGTH_LONG, TastyToast.SUCCESS);
+
+                Log.i(TAG,"Start calibration");
+                isCalibrating = true;
+
                 break;
         }
     }
@@ -646,9 +683,97 @@ public class EmgWaveMActivity extends BaseActivity {
             byte[] pitch = new byte[2];
             pitch[0] = data[14];
             pitch[1] = data[15];
-            byte[] yaw = new byte[2];
-            yaw[0] = data[16];
-            yaw[1] = data[17];
+            //edited by yxx
+            byte[] mag_x_raw = new byte[2];
+            mag_x_raw[0] = data[16];
+            mag_x_raw[1] = data[17];
+
+            byte[] mag_y_raw = new byte[2];
+            mag_y_raw[0] = data[18];
+            mag_y_raw[1] = data[19];
+
+//            byte[] mag_z_raw = new byte[2];
+//            mag_z_raw[0] = data[18];
+//            mag_z_raw[1] = data[19];
+
+
+
+//            byte[] yaw = new byte[2];
+//            yaw[0] = data[16];
+//            yaw[1] = data[17];
+
+            //edited by yxx
+            mag_x = (short)bytes2int(mag_x_raw);
+            mag_y = (short)bytes2int(mag_y_raw);
+//            mag_z = (short)bytes2int(mag_z_raw);
+
+
+            if(isCalibrating){
+
+
+                mag_x_buffer[buffer_count] = mag_x;
+                mag_y_buffer[buffer_count] = mag_y;
+//                mag_z_buffer[buffer_count] = mag_z;
+
+                if(mag_x > mag_x_max) mag_x_max = mag_x;
+                if(mag_x < mag_x_min) mag_x_min = mag_x;
+
+                if(mag_y > mag_y_max) mag_y_max = mag_y;
+                if(mag_y < mag_y_min) mag_y_min = mag_y;
+
+//                if(mag_z > mag_z_max) mag_z_max = mag_z;
+//                if(mag_z < mag_z_min) mag_z_min = mag_z;
+
+                buffer_count++;
+
+
+                if(buffer_count == magBufferSize) {
+
+
+                    isCalibrating = false;
+                    buffer_count = 0;
+                    x_range = mag_x_max - mag_x_min;
+                    y_range = mag_y_max - mag_y_min;
+//                    z_range = mag_z_max - mag_z_min;
+
+
+
+
+                    Message cali_result = new Message();
+
+
+                    if(x_range > 550 && y_range> 550 ){
+
+                        cali_result.what = CALIBRATION_SUCCESS;
+
+
+                        mag_x_offset = (short)((mag_x_max + mag_x_min) /2.0);
+                        mag_y_offset = (short)((mag_y_max + mag_y_min) /2.0);
+//                        mag_z_offset = (short)((mag_z_max + mag_z_min) /2.0);
+
+                        mag_y_ratio = (float)x_range/(float)y_range;
+//                        mag_z_ratio =x_range/z_range;
+
+
+                        //should store data here :mag_x_offset, mag_y_offset, mag_y_ratio
+                        //not realized yet
+
+                    }
+                    else{
+
+                       cali_result.what = CALIBRATION_FAILED;
+
+
+                    }
+                    handler.sendMessage(cali_result);
+
+                }
+
+            }
+
+            mag_x_final =  (short)(mag_x - mag_x_offset);
+            mag_y_final =  (short)(mag_y_ratio * (mag_y - mag_y_offset));
+
             int[] data_hand = new int[8];
             data_hand[0] = byte2Int(finger_1);
             data_hand[1] = byte2Int(finger_2);
@@ -657,7 +782,12 @@ public class EmgWaveMActivity extends BaseActivity {
             data_hand[4] = byte2Int(finger_5);
             data_hand[5] = bytes2int(roll);
             data_hand[6] = bytes2int(pitch);
-            data_hand[7] = bytes2int(yaw);
+
+            data_hand[7] = (int)(10* Math.toDegrees(Math.atan2(mag_x_final,mag_y_final)));
+
+
+//            data_hand[7] = bytes2int(yaw);
+
 
 
             int[] temp = new int[8];
@@ -689,51 +819,6 @@ public class EmgWaveMActivity extends BaseActivity {
 
 
             if (initFlag == 2) {
-//                if (data_hand[0] >= initStartData[0]) {
-////                    temp[0] = initStartData[0];
-////                } else if (data_hand[0] < initEndData[0]) {
-////                    temp[0] = initEndData[0];
-////
-////                } else {
-////                    temp[0] = data_hand[0];
-////                }
-////
-////                if (data_hand[1] >= initStartData[1]) {
-////                    temp[1] = initStartData[1];
-////                } else if (data_hand[1] < initEndData[1]) {
-////                    temp[1] = initEndData[1];
-////
-////                } else {
-////                    temp[1] = data_hand[1];
-////                }
-////
-////
-////                if (data_hand[2] >= initStartData[2]) {
-////                    temp[2] = initStartData[2];
-////                } else if (data_hand[2] < initEndData[2]) {
-////                    temp[2] = initEndData[2];
-////
-////                } else {
-////                    temp[2] = data_hand[2];
-////                }
-////
-////                if (data_hand[3] >= initStartData[3]) {
-////                    temp[3] = initStartData[3];
-////                } else if (data_hand[3] < initEndData[3]) {
-////                    temp[3] = initEndData[3];
-////
-////                } else {
-////                    temp[3] = data_hand[3];
-////                }
-////
-////                if (data_hand[4] >= initStartData[4]) {
-////                    temp[4] = initStartData[4];
-////                } else if (data_hand[4] < initEndData[4]) {
-////                    temp[4] = initEndData[4];
-////
-////                } else {
-////                    temp[4] = data_hand[4];
-////                }
 
                 if (data_hand[0] >= initStartData[0]) {
                     temp[0] = initStartData[0];

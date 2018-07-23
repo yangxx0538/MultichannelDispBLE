@@ -162,4 +162,5 @@
     <string name="rest_wave">重置</string>
     <string name="stop_wave">停止</string>
     <string name="open_unity">演示</string>
+    <string name="mag_calibration">校准</string>
 </resources>

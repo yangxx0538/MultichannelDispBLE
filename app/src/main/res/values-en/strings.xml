@@ -161,4 +161,5 @@
     <string name="rest_wave">REST</string>
     <string name="stop_wave">STOP</string>
     <string name="open_unity">DEMO</string>
+    <string name="mag_calibration">CALIBRATION</string>
 </resources>
