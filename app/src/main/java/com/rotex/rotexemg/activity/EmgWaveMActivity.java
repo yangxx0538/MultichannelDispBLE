@@ -104,8 +104,8 @@ public class EmgWaveMActivity extends BaseActivity {
     float mag_z_ratio = 1,mag_y_ratio = 1;
     int x_range,y_range,z_range;
     short mag_x,mag_y,mag_z;
-    short mag_x_final,mag_y_final;
-
+    double mag_x_final,mag_y_final,mag_z_final;
+    double magnitude;
     Button open_demo;
     final int SEND_WAVE_DATA = 0x001;
     final int CALIBRATION_SUCCESS = 0x002;
@@ -659,7 +659,7 @@ public class EmgWaveMActivity extends BaseActivity {
 
     synchronized void decodeDataManyDevice(byte[] data) {
         // Log.e(TAG, "decodeDataManyDevice: have data" );
-        if ((data[0] & 0xff) == 127 && (data[1] & 0xff) == 247) {
+//        if ((data[0] & 0xff) == 127 && (data[1] & 0xff) == 247) {
 
             byte[] finger_1 = new byte[2];
             finger_1[0] = data[2];
@@ -677,12 +677,12 @@ public class EmgWaveMActivity extends BaseActivity {
             finger_5[0] = data[10];
             finger_5[1] = data[11];
 
-            byte[] roll = new byte[2];
-            roll[0] = data[12];
-            roll[1] = data[13];
             byte[] pitch = new byte[2];
-            pitch[0] = data[14];
-            pitch[1] = data[15];
+            pitch[0] = data[12];
+            pitch[1] = data[13];
+            byte[] roll = new byte[2];
+            roll[0] = data[14];
+            roll[1] = data[15];
             //edited by yxx
             byte[] mag_x_raw = new byte[2];
             mag_x_raw[0] = data[16];
@@ -692,9 +692,9 @@ public class EmgWaveMActivity extends BaseActivity {
             mag_y_raw[0] = data[18];
             mag_y_raw[1] = data[19];
 
-//            byte[] mag_z_raw = new byte[2];
-//            mag_z_raw[0] = data[18];
-//            mag_z_raw[1] = data[19];
+            byte[] mag_z_raw = new byte[2];
+            mag_z_raw[0] = data[0];
+            mag_z_raw[1] = data[1];
 
 
 
@@ -705,7 +705,7 @@ public class EmgWaveMActivity extends BaseActivity {
             //edited by yxx
             mag_x = (short)bytes2int(mag_x_raw);
             mag_y = (short)bytes2int(mag_y_raw);
-//            mag_z = (short)bytes2int(mag_z_raw);
+            mag_z = (short)bytes2int(mag_z_raw);
 
 
             if(isCalibrating){
@@ -713,7 +713,7 @@ public class EmgWaveMActivity extends BaseActivity {
 
                 mag_x_buffer[buffer_count] = mag_x;
                 mag_y_buffer[buffer_count] = mag_y;
-//                mag_z_buffer[buffer_count] = mag_z;
+                mag_z_buffer[buffer_count] = mag_z;
 
                 if(mag_x > mag_x_max) mag_x_max = mag_x;
                 if(mag_x < mag_x_min) mag_x_min = mag_x;
@@ -721,8 +721,8 @@ public class EmgWaveMActivity extends BaseActivity {
                 if(mag_y > mag_y_max) mag_y_max = mag_y;
                 if(mag_y < mag_y_min) mag_y_min = mag_y;
 
-//                if(mag_z > mag_z_max) mag_z_max = mag_z;
-//                if(mag_z < mag_z_min) mag_z_min = mag_z;
+                if(mag_z > mag_z_max) mag_z_max = mag_z;
+                if(mag_z < mag_z_min) mag_z_min = mag_z;
 
                 buffer_count++;
 
@@ -734,7 +734,7 @@ public class EmgWaveMActivity extends BaseActivity {
                     buffer_count = 0;
                     x_range = mag_x_max - mag_x_min;
                     y_range = mag_y_max - mag_y_min;
-//                    z_range = mag_z_max - mag_z_min;
+                    z_range = mag_z_max - mag_z_min;
 
 
 
@@ -742,17 +742,17 @@ public class EmgWaveMActivity extends BaseActivity {
                     Message cali_result = new Message();
 
 
-                    if(x_range > 550 && y_range> 550 ){
+                    if(x_range > 450 && y_range> 450 && z_range> 450){
 
                         cali_result.what = CALIBRATION_SUCCESS;
 
 
                         mag_x_offset = (short)((mag_x_max + mag_x_min) /2.0);
                         mag_y_offset = (short)((mag_y_max + mag_y_min) /2.0);
-//                        mag_z_offset = (short)((mag_z_max + mag_z_min) /2.0);
+                        mag_z_offset = (short)((mag_z_max + mag_z_min) /2.0);
 
                         mag_y_ratio = (float)x_range/(float)y_range;
-//                        mag_z_ratio =x_range/z_range;
+                        mag_z_ratio = (float)x_range/(float)z_range;
 
 
                         //should store data here :mag_x_offset, mag_y_offset, mag_y_ratio
@@ -771,8 +771,27 @@ public class EmgWaveMActivity extends BaseActivity {
 
             }
 
-            mag_x_final =  (short)(mag_x - mag_x_offset);
-            mag_y_final =  (short)(mag_y_ratio * (mag_y - mag_y_offset));
+
+
+//            mag_x_offset = 96;
+//            mag_y_offset = -17;
+//            mag_z_offset = -93;
+//
+//            mag_y_ratio = (float)0.703;
+//            mag_z_ratio = (float)0.735;
+
+            mag_x_final =  (mag_x - mag_x_offset);
+            mag_y_final = (mag_y_ratio * (mag_y - mag_y_offset));
+            mag_z_final =  (mag_z_ratio * (mag_z - mag_z_offset));
+
+            magnitude = Math.sqrt(mag_x_final*mag_x_final + mag_y_final*mag_y_final + mag_z_final*mag_z_final);
+
+
+            mag_x_final /= magnitude;
+
+            mag_y_final /= magnitude;
+
+            mag_z_final /= magnitude;
 
             int[] data_hand = new int[8];
             data_hand[0] = byte2Int(finger_1);
@@ -780,10 +799,37 @@ public class EmgWaveMActivity extends BaseActivity {
             data_hand[2] = byte2Int(finger_3);
             data_hand[3] = byte2Int(finger_4);
             data_hand[4] = byte2Int(finger_5);
-            data_hand[5] = bytes2int(roll);
-            data_hand[6] = bytes2int(pitch);
+            data_hand[5] = bytes2int(pitch);
+            data_hand[6] = bytes2int(roll);
 
-            data_hand[7] = (int)(10* Math.toDegrees(Math.atan2(mag_x_final,mag_y_final)));
+
+            double theta  =  ((short)data_hand[6]) * Math.PI / 1800.0 ;
+            double phi      =  ((short)data_hand[5]) * Math.PI / 1800.0 ;
+
+
+//            mag_x_final = mag_x_final / Math.cos(theta);
+//            mag_y_final = mag_y_final / Math.cos(phi);
+
+//
+            mag_x_final = mag_x_final * Math.cos(theta) + mag_y_final* Math.sin(theta)*Math.sin(phi) - mag_z_final*Math.cos(phi)*Math.sin(theta);
+            mag_y_final = mag_z_final*Math.sin(phi) - mag_y_final * Math.cos(phi);
+
+            Log.i(TAG,"x:" + mag_x_final + " y: "+mag_y_final+ " z: "+mag_z_final + " phi: " + phi + " theta " + theta + " mag: " + magnitude);
+//
+//            if(mag_x_final < 0){
+//
+//                data_hand[7] = 1800 - (int)(10* Math.toDegrees(Math.atan2(mag_x_final,mag_y_final)));
+//            }
+//            else if(mag_x_final >0 && mag_y_final <0){
+//
+//                data_hand[7] =  -(int)(10* Math.toDegrees(Math.atan2(mag_x_final,mag_y_final)));
+//            }
+//            else if(mag_x_final >0 && mag_y_final >0){
+//
+//                data_hand[7] =  3600 - (int)(10* Math.toDegrees(Math.atan2(mag_x_final,mag_y_final)));
+//            }
+
+             data_hand[7] = (int)(10* Math.toDegrees(Math.atan2(mag_x_final,mag_y_final)) );
 
 
 //            data_hand[7] = bytes2int(yaw);
@@ -906,7 +952,7 @@ public class EmgWaveMActivity extends BaseActivity {
             }
         }
 
-    }
+//    }
 
     //高位在前，低位在后
     public int bytes2int(byte[] bytes) {
